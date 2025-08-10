@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+
+# Logs
+*.log
+logs/
+
+# VSCode / IDE
+.vscode/
+.idea/
+
+# Mac
+.DS_Store
+
+# Arduino build
+*.hex
+*.elf
+build/

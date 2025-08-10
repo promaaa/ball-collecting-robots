@@ -1,0 +1,2 @@
+numpy>=1.24
+matplotlib>=3.7 # optional, kinematics_sim falls back gracefully
