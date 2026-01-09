@@ -1,19 +1,72 @@
 # Python
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# Logs
-*.log
-logs/
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
 
-# VSCode / IDE
-.vscode/
+# IDE
 .idea/
-
-# Mac
+.vscode/
+*.swp
+*.swo
+*~
 .DS_Store
 
-# Arduino build
-*.hex
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Type checkers
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Linters
+.ruff_cache/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Arduino build artifacts
 *.elf
+*.hex
+*.bin
+*.map
 build/
+
+# Data outputs (keep sample data, ignore generated)
+data/motor_params.json
+output/
+
+# Logs (keep examples)
+logs/*.log
+!logs/example_*.log
+
+# Environment
+.env
+.env.local
