@@ -5,18 +5,6 @@
 
 **📖 [Complete Technical Report & Portfolio](https://promaaa.github.io/portfolio/ball-collecting-writeup.html)**
 
-## Table of Contents
-
-- [Overview](#overview)
-- [Key Achievements](#key-achievements)
-- [System Architecture](#system-architecture)
-- [Control System](#control-system)
-- [Results Summary](#results-summary)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Documentation](#documentation)
-- [License](#license)
-
 ## Overview
 
 This project presents the complete design, modeling, and experimental validation of an autonomous differential-drive robot capable of detecting, approaching, and centering on table tennis balls with **sub-centimeter precision** (≤ ±0.5-1 cm accuracy). 
@@ -29,6 +17,18 @@ The work demonstrates a systematic engineering approach through two iterative pr
 <br>
 <em>Left: Prototype 1 (servo-based) | Right: Prototype 2 (DC motors + encoders)</em>
 </div>
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Key Achievements](#key-achievements)
+- [System Architecture](#system-architecture)
+- [Control System](#control-system)
+- [Results Summary](#results-summary)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [Documentation](#documentation)
+- [License](#license)
 
 ## Key Achievements
 
