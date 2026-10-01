@@ -1,5 +1,7 @@
 # Autonomous Table Tennis Ball Collecting Robot
 
+*Solo project, built during CPGE (PSI\*) preparatory classes.*
+
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Project Status](https://img.shields.io/badge/Status-Completed-success.svg)]()
 
