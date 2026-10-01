@@ -80,9 +80,11 @@ Key hardware transition: servos → DC motors (1:24 gearbox) + incremental encod
 3. **Cascaded PI**: Outer guidance loop + inner speed regulation loop
 
 **Motor Modeling:**
-- First-order system identification: `G(p) = 4/(1 + 0.035p)`
-- Speed loop PI parameters: `Kₚ = 44, Tᵢ = 0.17s`
+- First-order system identification: `G(p) = 4/(1 + 0.024p)`, time constant fitted to `data/step_response.csv`
+- Speed loop PI parameters: `Kₚ = 44, Tᵢ = 0.17s` (designed with an earlier estimate, τ = 0.035 s)
 - Measured stability margins: 66° phase, infinite gain margin
+
+![Measured step response and first-order fit](docs/step-response.svg)
 
 ## Results Summary
 
@@ -96,7 +98,7 @@ Key hardware transition: servos → DC motors (1:24 gearbox) + incremental encod
 **Key Findings:**
 - Servo asymmetry: 12-15% gain difference quantified between left/right motors
 - Bottleneck evolution: Actuation (P1) → Actuation (P1) → Perception (P2)
-- Model validation: <5% error between predicted and measured responses
+- Model validation: about 1% maximum error between the fitted model and `data/step_response.csv`
 
 ## Project Structure
 
