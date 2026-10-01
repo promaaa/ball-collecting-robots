@@ -42,7 +42,7 @@ The work demonstrates a systematic engineering approach through two iterative pr
 **Performance Metrics:**
 - Accuracy: ±0.5-1 cm steady-state error
 - Systematic oscillation elimination through controller design
-- Validated across static and moving targets with motion capture ground truth
+- Validated across static and moving targets (logged wheel commands in [`data/proto1-runs/`](data/proto1-runs/))
 
 **Engineering Process:**
 - Complete modeling → simulation → prototyping → validation cycle
@@ -100,6 +100,10 @@ Key hardware transition: servos → DC motors (1:24 gearbox) + incremental encod
 - Bottleneck evolution: Actuation (P1) → Actuation (P1) → Perception (P2)
 - Model validation: about 1% maximum error between the fitted model and `data/step_response.csv`
 
+![Prototype 1 wheel commands, P vs PI controller, static ball](docs/proto1-p-vs-pi.svg)
+
+*Prototype 1, static ball. The P controller keeps driving one wheel into saturation (90 = full speed). The PI controller keeps both wheels inside their range.*
+
 ## Project Structure
 
 ```
@@ -119,7 +123,8 @@ ball-collecting-robots/
 │   └── motor_identification.py # Motor parameter identification
 │
 ├── data/                      # Experimental data
-│   └── step_response.csv     # Motor characterization data
+│   ├── step_response.csv     # Motor characterization data
+│   └── proto1-runs/          # Prototype 1 wheel-command logs (P and PI, static and moving ball)
 │
 ├── tools/                     # Utilities
 │   ├── log_parser.py         # Data processing
