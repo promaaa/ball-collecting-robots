@@ -3,11 +3,11 @@
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Project Status](https://img.shields.io/badge/Status-Completed-success.svg)]()
 
-**📖 [Complete Technical Report & Portfolio](https://promaaa.github.io/portfolio/ball-collecting-writeup.html)**
+**📖 [Complete Technical Report & Portfolio](https://promaaa.github.io/portfolio/projects/ball-collecting/)**
 
 ## Overview
 
-This project presents the complete design, modeling, and experimental validation of an autonomous differential-drive robot capable of detecting, approaching, and centering on table tennis balls with **sub-centimeter precision** (≤ ±0.5-1 cm accuracy). 
+This project presents the complete design, modeling, and experimental validation of an autonomous differential-drive robot capable of detecting, approaching, and centering on table tennis balls with **±0.5–1 cm steady-state error**. 
 
 The work demonstrates a systematic engineering approach through two iterative prototypes, progressing from basic proportional control with servos to cascaded PI control with DC motors and encoder feedback.
 
@@ -99,7 +99,7 @@ Key hardware transition: servos → DC motors (1:24 gearbox) + incremental encod
 ## Project Structure
 
 ```
-autonomous-ball-collector/
+ball-collecting-robots/
 ├── README.md                    # Project overview and setup guide
 ├── LICENSE                     # MIT License
 ├── requirements.txt           # Python dependencies
@@ -145,8 +145,8 @@ autonomous-ball-collector/
 ### Software Installation
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/autonomous-ball-collector.git
-cd autonomous-ball-collector
+git clone https://github.com/promaaa/ball-collecting-robots.git
+cd ball-collecting-robots
 
 # Install Python dependencies
 pip install -r requirements.txt
@@ -170,16 +170,12 @@ arduino-cli upload --fqbn arduino:avr:uno --port /dev/ttyUSB0 firmware/prototype
 ## Documentation
 
 ### Technical References
-- **[Complete Project Analysis](https://promaaa.github.io/portfolio/ball-collecting-writeup.html)**: Detailed technical report with interactive figures and comprehensive analysis
+- **[Complete Project Analysis](https://promaaa.github.io/portfolio/projects/ball-collecting/)**: Detailed technical report with interactive figures and comprehensive analysis
 
 ### Future Improvements
 - **Perception**: Enhanced vision with depth sensing, CNN-based detection
 - **Control**: Derivative action, adaptive gain scheduling, predictive interception
 - **Robustness**: Battery voltage compensation, sensor fusion, environmental adaptation
-
-## Contributing
-
-This project represents a completed research and development effort. Contributions for improvements, extensions, or bug fixes are welcome.
 
 ## License
 
@@ -188,4 +184,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **Marc Duboc**  
-*Complete project documentation and interactive analysis available at: https://promaaa.github.io/portfolio/ball-collecting-writeup.html*
+*Complete project documentation and interactive analysis available at: https://promaaa.github.io/portfolio/projects/ball-collecting/*
