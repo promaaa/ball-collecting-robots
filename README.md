@@ -13,7 +13,6 @@ The full report, with every equation and figure, is on my [project page](https:/
 | Prototype 1 | Prototype 2 |
 | :---: | :---: |
 | <img src="pictures/robot1.jpg" width="380" alt="Prototype 1: Kitronik chassis, servos, Pixy2 camera and gripper"> | <img src="pictures/robot_overview.jpg" width="380" alt="Prototype 2 seen from above, facing a ball on a bearing test sheet"> |
-| Kitronik :MOVE mini chassis, two continuous servos, Arduino UNO | DC motors with a 1:24 gearbox, encoders and an H-bridge |
 
 ## How it works
 
