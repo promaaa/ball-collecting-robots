@@ -1,196 +1,106 @@
-# Autonomous Table Tennis Ball Collecting Robot
+# Table Tennis Ball Collecting Robot
 
-*Solo project, built during CPGE (PSI\*) preparatory classes.*
+<p align="center">
+  <img src="docs/teaser.gif" width="640" alt="Animation: a ball bounces off a table tennis table, the robot spins until its camera finds the ball, then drives to it and picks it up">
+  <br>
+  <sub>Rendered animation of prototype 1. Bottom right: what the Pixy2 camera sees.</sub>
+</p>
 
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Project Status](https://img.shields.io/badge/Status-Completed-success.svg)]()
+A small two-wheeled robot that finds a table tennis ball with a camera, drives to it and picks it up with a 3D-printed gripper. I built it on my own during my CPGE years (PSI\*), as two prototypes. For each one I wrote a model, simulated it, and checked it against measurements on the real robot.
 
-**📖 [Complete Technical Report & Portfolio](https://promaaa.github.io/portfolio/projects/ball-collecting/)**
+The full report, with every equation and figure, is on my [project page](https://promaa.github.io/portfolio/projects/ball-collecting/).
 
-## Overview
+| Prototype 1 | Prototype 2 |
+| :---: | :---: |
+| <img src="pictures/robot1.jpg" width="380" alt="Prototype 1: Kitronik chassis, servos, Pixy2 camera and gripper"> | <img src="pictures/robot_overview.jpg" width="380" alt="Prototype 2 seen from above, facing a ball on a bearing test sheet"> |
+| Kitronik :MOVE mini chassis, two continuous servos, Arduino UNO | DC motors with a 1:24 gearbox, encoders and an H-bridge |
 
-This project presents the complete design, modeling, and experimental validation of an autonomous differential-drive robot capable of detecting, approaching, and centering on table tennis balls with **±0.5–1 cm steady-state error**. 
+## How it works
 
-The work demonstrates a systematic engineering approach through two iterative prototypes, progressing from basic proportional control with servos to cascaded PI control with DC motors and encoder feedback.
+A Pixy2 camera looks for the orange blob and returns its position in a 316 × 208 px image. The horizontal distance between the ball and the image centre gives the bearing error:
 
-<div align="center">
-<img src="pictures/robot1.jpg" alt="Prototype 1" width="400"/>
-<img src="pictures/robot_overview.jpg" alt="Prototype 2" width="400"/>
-<br>
-<em>Left: Prototype 1 (servo-based) | Right: Prototype 2 (DC motors + encoders)</em>
-</div>
+$$\varepsilon \approx \frac{x_{ball} - x_{center}}{f_x}$$
 
-## Table of Contents
+The Arduino turns this error into a speed difference between the two wheels. The robot keeps a base speed $\Omega_0$ and turns until the ball sits in the middle of the image:
 
-- [Overview](#overview)
-- [Key Achievements](#key-achievements)
-- [System Architecture](#system-architecture)
-- [Control System](#control-system)
-- [Results Summary](#results-summary)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Documentation](#documentation)
-- [License](#license)
+$$\Omega_{right} = \Omega_0 + K\,\varepsilon \qquad \Omega_{left} = \Omega_0 - K\,\varepsilon$$
 
-## Key Achievements
+I started with a constant gain $K$ (P control), then added an integral term (PI) to remove the remaining offset.
 
-**Control System Evolution:**
-- Prototype 1: P and PI guidance with servo actuation
-- Prototype 2: Cascaded PI control (guidance + speed loops) with DC motors
-- Achieved 66° phase margin and infinite gain margin (exceeding design targets)
+<p align="center"><img src="docs/img/pixy-frame.png" width="420" alt="Pixy2 image, 316 by 208 pixels, with the error between the image centre and the ball"></p>
 
-**Performance Metrics:**
-- Accuracy: ±0.5-1 cm steady-state error
-- Systematic oscillation elimination through controller design
-- Validated across static and moving targets (logged wheel commands in [`data/proto1-runs/`](data/proto1-runs/))
+## Two prototypes
 
-**Engineering Process:**
-- Complete modeling → simulation → prototyping → validation cycle
-- Quantified servo asymmetry leading to hardware redesign
-- Successful bottleneck migration from actuation to perception
+The diagrams and plots below come from my original report, so their labels are in French.
 
-## System Architecture
+<img src="docs/img/prototype1-architecture.png" alt="Prototype 1 block diagram: camera, controller, left and right servos, kinematics">
 
-**Prototype 1: Servo-Based Platform**
-```
-[Camera] → [Arduino UNO] → [Servo Motors]
-    ↓           ↓              ↓
-[Vision]   [P/PI Control]  [Asymmetric Response]
-```
+**Prototype 1** sends the guidance output straight to two hobby servos. On the bench, the right servo turned out 12 to 15 % stronger than the left one, and the left one had a wider dead zone. With P control the robot weaves around the line to the ball. PI removes the offset but pushes the servos into saturation, so the actuators became the limit.
 
-**Prototype 2: Encoder-Feedback Platform**
-```
-[Camera] → [Arduino] → [Speed Control] → [DC Motors + Gearbox]
-    ↓          ↓            ↓                ↓
-[Vision]  [Outer PI]  [Inner PI Loop]   [Encoders]
-```
+<img src="docs/img/prototype2-architecture.png" alt="Prototype 2 block diagram: same guidance loop, with a PI speed loop and an encoder on each wheel">
 
-Key hardware transition: servos → DC motors (1:24 gearbox) + incremental encoders + H-bridge driver, enabling cascaded control architecture and eliminating mechanical asymmetry limitations.
+**Prototype 2** replaces the servos with DC motors and encoders, and runs a PI speed loop on each wheel at 100 Hz. I modelled each motor as a first-order system from a step response (data in [`data/step_response.csv`](data/step_response.csv)) and tuned the speed loop on that model: Kp = 44, Ti = 0.17 s, 66° phase margin. The guidance loop then only sets wheel speed targets.
 
-## Control System
+Before testing on the floor, I simulated the whole system in Scilab Xcos:
 
-**Vision-Based Guidance:**
-- Real-time color segmentation (HSV) for orange/white table tennis balls
-- Centroid extraction and bearing error calculation: `ε ≈ (x_px - c_x) / f_x`
-- Small-angle approximation for control input generation
+<img src="docs/img/scilab-model.png" alt="Scilab Xcos block diagram of the complete simulated system">
 
-**Control Evolution:**
-1. **Proportional (P)**: `Ω_cmd = Ω₀ ± Kₚ·ε`
-2. **Proportional-Integral (PI)**: `C(p) = Kₚ + Kᵢ/p`
-3. **Cascaded PI**: Outer guidance loop + inner speed regulation loop
+## Results
 
-**Motor Modeling:**
-- First-order system identification: `G(p) = 4/(1 + 0.024p)`, time constant fitted to `data/step_response.csv`
-- Speed loop PI parameters: `Kₚ = 44, Tᵢ = 0.17s` (designed with an earlier estimate, τ = 0.035 s)
-- Measured stability margins: 66° phase, infinite gain margin
+| | |
+| :---: | :---: |
+| <img src="docs/img/servo-asymmetry.png" width="330" alt="Wheel speed against PWM command for the left and right servos"> | <img src="docs/img/p-vs-pi.png" width="420" alt="Measured paths of prototype 1 towards a static ball with P and PI control"> |
+| Prototype 1: wheel speed against PWM command. Red is the left servo, blue the right one. | Prototype 1: measured paths to a static ball. Pink is P (gain 0.87), yellow is PI. |
+| <img src="docs/img/motor-model.png" width="380" alt="Wheel speed step response, first-order model against Arduino measurement"> | <img src="docs/img/p2-model-vs-measured.png" width="420" alt="Prototype 2 path to a static ball, simulation against measurement"> |
+| Prototype 2: wheel speed step response, model against measurement. | Prototype 2: simulated (yellow) and measured (blue) path to a static ball. |
 
-![Measured step response and first-order fit](docs/step-response.svg)
+| | Prototype 1, P | Prototype 1, PI | Prototype 2 |
+| --- | --- | --- | --- |
+| Final error | ±2 to 3 cm | ±0.5 to 1 cm | ±0.5 to 1 cm |
+| Oscillation | strong | moderate | none visible |
+| What limits it | servo asymmetry and saturation | servo saturation | camera frame rate and lighting |
 
-## Results Summary
+<p align="center"><img src="docs/img/p1-vs-p2.png" width="460" alt="Measured paths of prototype 1 and prototype 2 towards the same ball"></p>
 
-| Metric | Prototype 1 (P) | Prototype 1 (PI) | Prototype 2 (Cascaded PI) |
-|--------|-----------------|-------------------|----------------------------|
-| **Steady-State Error** | ±2-3 cm | ±0.5-1 cm | ±0.5-1 cm |
-| **Oscillations** | High | Moderate | Minimal |
-| **Speed Limitation** | Servo saturation | Servo saturation | Vision-limited |
-| **Stability** | Marginal | Good | Excellent |
+Measured paths to the same ball: prototype 1 with PI in blue, prototype 2 in green. The second prototype gets there faster and without the final oscillation. What limits it now is the camera, not the motors.
 
-**Key Findings:**
-- Servo asymmetry: 12-15% gain difference quantified between left/right motors
-- Bottleneck evolution: Actuation (P1) → Actuation (P1) → Perception (P2)
-- Model validation: about 1% maximum error between the fitted model and `data/step_response.csv`
-
-![Prototype 1 wheel commands, P vs PI controller, static ball](docs/proto1-p-vs-pi.svg)
-
-*Prototype 1, static ball. The P controller keeps driving one wheel into saturation (90 = full speed). The PI controller keeps both wheels inside their range.*
-
-## Project Structure
+## Repository
 
 ```
-ball-collecting-robots/
-├── README.md                    # Project overview and setup guide
-├── LICENSE                     # MIT License
-├── requirements.txt           # Python dependencies
-├── 
-├── firmware/                  # Embedded code
-│   ├── prototype1/           # Servo-based implementation
-│   │   └── servo_guidance_pi.ino
-│   └── prototype2/           # DC motor implementation
-│       └── motor_speed_pi.ino
-│
-├── modeling/                  # Analysis and simulation
-│   ├── kinematics_sim.py     # Kinematic simulations
-│   └── motor_identification.py # Motor parameter identification
-│
-├── data/                      # Experimental data
-│   ├── step_response.csv     # Motor characterization data
-│   └── proto1-runs/          # Prototype 1 wheel-command logs (P and PI, static and moving ball)
-│
-├── tools/                     # Utilities
-│   ├── log_parser.py         # Data processing
-│   └── export_gains.py       # Parameter extraction
-│
-├── pictures/                  # Project images
-│   ├── robot1.jpg           # Prototype 1 photo
-│   └── robot_overview.jpg   # Prototype 2 photo
-│
-└── logs/                      # Test logs
-    └── example_proto2.log    # Sample experimental data
+firmware/prototype1/servo_guidance_pi.ino   Pixy2 guidance on the servos, P or PI, 20 Hz
+firmware/prototype2/motor_speed_pi.ino      PI speed loop on each wheel with encoders, 100 Hz
+modeling/kinematics_sim.py                  kinematic simulation of the guidance loop
+modeling/motor_identification.py            first-order fit of the motor step response
+tools/log_parser.py                         reads the serial logs of both prototypes
+tools/export_gains.py                       writes tuned gains to an Arduino header
+data/step_response.csv                      measured motor step response
+data/proto1-runs/                           wheel commands logged by prototype 1, P and PI, static and moving ball
 ```
 
-## Getting Started
+## Running the code
 
-### Prerequisites
-- Arduino IDE (for firmware compilation)
-- Python 3.x (for modeling and analysis)
-- Required Python packages: `pip install -r requirements.txt`
-
-### Hardware Setup
-1. **Assemble the robot** following the architecture diagrams
-2. **Connect components** according to the wiring specifications
-3. **Calibrate sensors** (camera, encoders) for your specific setup
-4. **Upload firmware** appropriate to your prototype version
-
-### Software Installation
 ```bash
-# Clone the repository
 git clone https://github.com/promaaa/ball-collecting-robots.git
 cd ball-collecting-robots
-
-# Install Python dependencies
 pip install -r requirements.txt
 
-# Upload Arduino firmware (choose appropriate version)
-# For Prototype 1:
-arduino-cli compile --fqbn arduino:avr:uno firmware/prototype1/servo_guidance_pi.ino
-arduino-cli upload --fqbn arduino:avr:uno --port /dev/ttyUSB0 firmware/prototype1/servo_guidance_pi.ino
-
-# For Prototype 2:
-arduino-cli compile --fqbn arduino:avr:uno firmware/prototype2/motor_speed_pi.ino  
-arduino-cli upload --fqbn arduino:avr:uno --port /dev/ttyUSB0 firmware/prototype2/motor_speed_pi.ino
+python -m modeling.kinematics_sim --kp 1.2 --ki 0.5
+python -m modeling.motor_identification data/step_response.csv --plot
 ```
 
-### Quick Test
-1. **Power on** the robot and ensure all connections are secure
-2. **Place a table tennis ball** within the camera's field of view  
-3. **Observe** the robot's approach and centering behavior
-4. **Monitor** performance through serial output or logging
+The prototype 1 firmware needs the Pixy2 Arduino library. The prototype 2 firmware needs FlexiTimer2 and uses interrupt pins 18 and 19, which exist on an Arduino Mega.
 
-## Documentation
+```bash
+arduino-cli compile --fqbn arduino:avr:uno firmware/prototype1/servo_guidance_pi.ino
+arduino-cli compile --fqbn arduino:avr:mega firmware/prototype2/motor_speed_pi.ino
+```
 
-### Technical References
-- **[Complete Project Analysis](https://promaaa.github.io/portfolio/projects/ball-collecting/)**: Detailed technical report with interactive figures and comprehensive analysis
+## Next steps
 
-### Future Improvements
-- **Perception**: Enhanced vision with depth sensing, CNN-based detection
-- **Control**: Derivative action, adaptive gain scheduling, predictive interception
-- **Robustness**: Battery voltage compensation, sensor fusion, environmental adaptation
+- Faster and more reliable ball detection, since the camera is now the bottleneck.
+- A predictive term, so the robot can intercept a ball that is still rolling.
+- Battery voltage compensation.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-**Marc Duboc**  
-*Complete project documentation and interactive analysis available at: https://promaaa.github.io/portfolio/projects/ball-collecting/*
+MIT, see [LICENSE](LICENSE).
