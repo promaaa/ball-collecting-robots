@@ -41,18 +41,19 @@ The diagrams and plots below come from my original report, so their labels are i
 
 **Prototype 2** replaces the servos with DC motors and encoders, and runs a PI speed loop on each wheel at 100 Hz. I modelled each motor as a first-order system from a step response (data in [`data/step_response.csv`](data/step_response.csv)) and tuned the speed loop on that model: Kp = 44, Ti = 0.17 s, 66° phase margin. The guidance loop then only sets wheel speed targets.
 
+<p align="center"><img src="docs/img/pi-tuning.png" width="640" alt="PySyLiC PI tuning workspace: open-loop Bode plot of the wheel speed loop with K = 44 and T = 0.17 s, and the stability margins window"></p>
+
+PI tuning workspace in PySyLiC: open-loop Bode plot of the wheel speed loop with K = 44 and T = 0.17 s.
+
 Before testing on the floor, I simulated the whole system in Scilab Xcos:
 
 <img src="docs/img/scilab-model.png" alt="Scilab Xcos block diagram of the complete simulated system">
 
 ## Results
 
-| | |
-| :---: | :---: |
-| <img src="docs/img/servo-asymmetry.png" width="330" alt="Wheel speed against PWM command for the left and right servos"> | <img src="docs/img/p-vs-pi.png" width="420" alt="Measured paths of prototype 1 towards a static ball with P and PI control"> |
-| Prototype 1: wheel speed against PWM command. Red is the left servo, blue the right one. | Prototype 1: measured paths to a static ball. Pink is P (gain 0.87), yellow is PI. |
-| <img src="docs/img/motor-model.png" width="380" alt="Wheel speed step response, first-order model against Arduino measurement"> | <img src="docs/img/p2-model-vs-measured.png" width="420" alt="Prototype 2 path to a static ball, simulation against measurement"> |
-| Prototype 2: wheel speed step response, model against measurement. | Prototype 2: simulated (yellow) and measured (blue) path to a static ball. |
+<p align="center"><img src="docs/img/servo-asymmetry.png" width="330" alt="Wheel speed against PWM command for the left and right servos"></p>
+
+Prototype 1: wheel speed against PWM command. Red is the left servo, blue the right one.
 
 | | Prototype 1, P | Prototype 1, PI | Prototype 2 |
 | --- | --- | --- | --- |
